@@ -31,7 +31,7 @@
       width:100%;height:28px;background:transparent;position:absolute;left:0;bottom:-22px;filter:blur(0.6px);transform:translateY(6px);
     }
 
-    /* cake 3D layers */
+    /* cake layers */
     .cake{
       width:100%;height:180px;border-radius:20px;position:relative;box-shadow:0 22px 40px var(--shadow), inset 0 6px 14px rgba(255,255,255,0.25);
       transform:translateY(0);overflow:visible
@@ -46,7 +46,6 @@
       width:92%;height:62px;border-radius:14px;background:var(--cream);margin-top:6px;box-shadow:0 6px 18px rgba(0,0,0,0.06) inset, 0 10px 20px rgba(0,0,0,0.06)
     }
 
-    /* decorative swirls */
     .swirls{display:flex;gap:12px;justify-content:center;margin-top:-6px}
     .swirl{width:36px;height:12px;border-radius:12px;background:linear-gradient(90deg,#ffe2f0,#ffd0e6);transform:rotate(-8deg);box-shadow:0 2px 4px rgba(0,0,0,0.03)}
 
@@ -56,27 +55,22 @@
     }
     .candle:after{content:'';width:100%;height:6px;background:linear-gradient(90deg,#ffd9e9,#ffc7df);position:absolute;bottom:0;border-radius:0 0 4px 4px}
 
-    /* wick */
     .wick{width:2px;height:12px;background:#3b2b3b;margin-top:8px;border-radius:2px}
 
-    /* soft romantic flame (style B) */
     .flame-wrap{position:relative;margin-top:-6px;pointer-events:none}
     .flame{width:18px;height:28px;border-radius:50% 50% 40% 40%;position:relative;transform-origin:center bottom;filter:blur(0.4px);
       background: radial-gradient(circle at 50% 35%, #fff7c6 0%, #ffd57a 18%, #ff9a8a 52%, rgba(255,125,145,0.9) 78%);
       box-shadow:0 6px 24px rgba(232,76,136,0.14),0 2px 8px rgba(255,150,140,0.12);
       animation: flameSoft 900ms infinite ease-in-out;
     }
-
     .flame::after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:-6px;width:34px;height:18px;border-radius:50%;filter:blur(10px);background:radial-gradient(closest-side, rgba(232,76,136,0.12), rgba(232,76,136,0));opacity:0.95}
 
     @keyframes flameSoft{
       0%{transform:translateY(0) scale(1);}50%{transform:translateY(-6px) scale(0.92);}100%{transform:translateY(0) scale(1)}
     }
 
-    /* little sparks floating */
     .spark{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,220,120,0.95);opacity:0.9;box-shadow:0 2px 8px rgba(255,180,120,0.2)}
 
-    /* message */
     .message{margin-top:22px;padding:18px;border-radius:12px;background:linear-gradient(180deg,#fff 0%, #fff3f8 100%);box-shadow:0 10px 30px rgba(0,0,0,0.06);display:none;opacity:0;transform:translateY(6px);transition:all .8s cubic-bezier(.2,.9,.3,1)}
     .message.show{display:block;opacity:1;transform:translateY(0)}
 
@@ -84,7 +78,6 @@
     button{background:var(--accent);color:white;padding:10px 14px;border-radius:10px;border:0;cursor:pointer;font-weight:600;box-shadow:0 6px 18px rgba(232,76,136,0.18)}
     button.secondary{background:transparent;color:var(--accent);border:1px solid rgba(232,76,136,0.12);box-shadow:none}
 
-    /* responsive */
     @media (max-width:520px){
       .cake-wrap{width:320px}
       .cake{height:150px}
@@ -92,17 +85,15 @@
       .flame{width:14px;height:22px}
       h1{font-size:20px}
     }
-
   </style>
 </head>
 <body>
   <div class="stage">
     <h1>🎂 Doğum Günü Sürprizi</h1>
-    <p class="lead">Telefonun mikrofonuna üfle veya butona dokun — mum söndüğünde sürpriz mesajı çıkacak ✨</p>
+    <p class="lead">Telefonun mikrofonuna üfle — mum söndüğünde sürpriz mesajı çıkacak ✨</p>
 
     <div class="cake-wrap" id="scene">
       <div class="plate"></div>
-
       <div class="cake" aria-hidden="true">
         <div class="side">
           <div class="top-cream">
@@ -112,8 +103,6 @@
               <div class="swirl"></div>
             </div>
           </div>
-
-          <!-- Candle centered -->
           <div class="candle" id="candle">
             <div class="wick"></div>
             <div class="flame-wrap">
@@ -122,12 +111,10 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <div class="controls">
       <button id="allowMic">Mikrofonu Başlat</button>
-      <button id="tapBlow" class="secondary">Üfle (Dokun)</button>
       <button id="relight" class="secondary">Tekrar Yak</button>
     </div>
 
@@ -138,11 +125,9 @@
   </div>
 
   <script>
-    // Basit ama hassas blow detection ve UX
     const flame = document.getElementById('flame');
     const message = document.getElementById('message');
     const allowMic = document.getElementById('allowMic');
-    const tapBlow = document.getElementById('tapBlow');
     const relight = document.getElementById('relight');
 
     let audioCtx, analyser, source, dataArr, micStream;
@@ -154,14 +139,10 @@
 
     function blowOutVisual(){
       if(blown) return;
-      // gentle fade of flame
       flame.style.transition = 'opacity 450ms ease, transform 600ms ease';
       flame.style.opacity = '0';
       flame.style.transform = 'translateY(-4px) scale(0.85)';
-
-      // little spark burst
       spawnSparks(8);
-
       setTimeout(()=>{
         flame.style.display = 'none';
         showMessage();
@@ -177,18 +158,8 @@
       flame.style.transform = 'translateY(0) scale(1)';
     }
 
-    // user taps the 'Üfle (Dokun)' button as fallback or mobile quick action
-    tapBlow.addEventListener('click', ()=>{
-      blowOutVisual();
-    });
-
-    relight.addEventListener('click', ()=>{
-      relightCandle();
-    });
-
     allowMic.addEventListener('click', async ()=>{
-      // start microphone and analysis
-      if(audioCtx) return; // already started
+      if(audioCtx) return;
       try{
         micStream = await navigator.mediaDevices.getUserMedia({audio:true});
         audioCtx = new (window.AudioContext||window.webkitAudioContext)();
@@ -201,24 +172,20 @@
         allowMic.textContent = 'Mikrofon Aktif';
         allowMic.disabled = true;
       }catch(err){
-        alert('Mikrofon erişimi reddedildi veya desteklenmiyor. Dokun özelliğini kullanabilirsin.');
+        alert('Mikrofon erişimi reddedildi veya desteklenmiyor.');
       }
     });
 
     function monitorBlow(){
       analyser.getByteFrequencyData(dataArr);
-      // compute rough volume
       let sum = 0;
       for(let i=0;i<dataArr.length;i++) sum += dataArr[i];
       let avg = sum / dataArr.length;
 
-      // also measure sudden peaks by checking high-frequency bins
       let hfSum = 0, hfCount = 0;
       for(let i=Math.floor(dataArr.length*0.6); i<dataArr.length; i++){ hfSum += dataArr[i]; hfCount++; }
       let hfAvg = hfSum / Math.max(1,hfCount);
 
-      // dynamic threshold: phone blow tends produce a mid-high peak
-      // tuned by experience: require avg>22 and hfAvg>40 OR avg>40 (louder environments)
       if(!blown && ((avg>22 && hfAvg>42) || avg>46)){
         blowOutVisual();
       }
@@ -226,13 +193,11 @@
       requestAnimationFrame(monitorBlow);
     }
 
-    // tiny spark particles generator
     function spawnSparks(n){
       const wrap = document.getElementById('scene');
       for(let i=0;i<n;i++){
         const s = document.createElement('div');
         s.className = 'spark';
-        // position near flame
         const left = (wrap.clientWidth/2) + (Math.random()*36-18);
         const top = (wrap.clientHeight*0.18) + (Math.random()*8 - 6);
         s.style.left = left + 'px';
@@ -240,28 +205,15 @@
         s.style.opacity = Math.random()*0.9+0.4;
         s.style.transform = 'scale('+ (Math.random()*0.9+0.5) +')';
         wrap.appendChild(s);
-
-        // animate
         const dx = (Math.random()*80-40);
         const dy = -(Math.random()*80+40);
         s.animate([
           { transform: 'translate(0,0) scale(1)', opacity:1 },
           { transform: `translate(${dx}px, ${dy}px) scale(0.3)`, opacity:0 }
         ],{duration: 900 + Math.random()*600, easing: 'cubic-bezier(.2,.8,.2,1)'});
-
-        // remove
         setTimeout(()=>{ s.remove(); }, 2000 + Math.random()*1200);
       }
     }
-
-    // keyboard accessibility: press space to blow
-    window.addEventListener('keydown', (e)=>{
-      if(e.code==='Space') blowOutVisual();
-    });
-
-    // On mobile, allow quick double-tap on cake to blow
-    document.getElementById('scene').addEventListener('dblclick', ()=> blowOutVisual());
-
   </script>
 </body>
 </html>
